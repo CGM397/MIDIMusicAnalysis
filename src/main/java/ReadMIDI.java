@@ -5,9 +5,7 @@ import java.util.ArrayList;
 
 public class ReadMIDI {
 
-    private String path = "music/1.mid";
-
-    public void myRead(){
+    public void myRead(String path){
         MIDIService midiService = new MIDIServiceImpl();
         ArrayList<String> store = midiService.getSequence(path);
         ArrayList<ArrayList<String>> tracks = midiService.getTracks(store);
