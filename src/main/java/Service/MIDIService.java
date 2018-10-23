@@ -12,5 +12,5 @@ public interface MIDIService {
 
     public String getMusicalNote(String  note);
 
-    //public int getEventLen(String command, int offset, ArrayList<String> leftEvents);
+    public int getEventLen(String command, String lasCommand, int offset, ArrayList<String> leftEvents);
 }

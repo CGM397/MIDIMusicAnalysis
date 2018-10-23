@@ -104,42 +104,46 @@ public class MIDIServiceImpl implements MIDIService {
         return res;
     }
 
-    /*public int getEventLen(String command, int offset, ArrayList<String> leftEvents) {
+    public int getEventLen(String command, String lastCommand, int offset, ArrayList<String> leftEvents) {
         char leftNybble = command.charAt(0);
         int count = 0;
         if(leftNybble == '8'){
             System.out.println("音符关闭："+getMusicalNote(leftEvents.get(offset+1))+"；力度："+leftEvents.get(offset+2));
-            count += 2;
+            count = 2;
         } else if(leftNybble == '9'){
-            System.out.println("音符打开："+getMusicalNote(leftEvents.get(offset+1))+"；力度："+leftEvents.get(offset+2));
-            count += 2;
+            int vv = Integer.valueOf(leftEvents.get(offset+2),16);
+            if(vv == 0)
+                System.out.println("音符关闭："+getMusicalNote(leftEvents.get(offset+1))+"；力度："+leftEvents.get(offset+2));
+            else
+                System.out.println("音符打开："+getMusicalNote(leftEvents.get(offset+1))+"；力度："+leftEvents.get(offset+2));
+            count = 2;
         } else if(leftNybble == 'a'){
             System.out.println("触后音符："+getMusicalNote(leftEvents.get(offset+1))+"；力度："+leftEvents.get(offset+2));
-            count += 2;
+            count = 2;
         } else if(leftNybble == 'b'){
             System.out.println("调换控制，控制号："+leftEvents.get(offset+1)+"；新值："+leftEvents.get(offset+2));
-            count += 2;
+            count = 2;
         } else if(leftNybble == 'c'){
             System.out.println("改变程序，新的程序号："+leftEvents.get(offset+1));
-            count += 1;
+            count = 1;
         } else if(leftNybble == 'd'){
             System.out.println("在通道后接触，管道号："+leftEvents.get(offset+1));
-            count += 1;
+            count = 1;
         } else if(leftNybble == 'e'){
             System.out.println("滑音，音高低位："+leftEvents.get(offset+1)+"；音高高位："+leftEvents.get(offset+2));
-            count += 2;
+            count = 2;
         } else if(command.equals("ff")){
             System.out.println("Meta事件的类型："+leftEvents.get(offset+1));
             int metaDataLen = Integer.valueOf(leftEvents.get(offset+2),16);
-            count += 2;
+            count = 2;
             count += metaDataLen;
         } else if(command.equals("f0")){
             System.out.println("系统码事件");
         } else if(Integer.valueOf(command,16) >= 0 && Integer.valueOf(command,16) <= 127 && !lastCommand.equals("")){
-
+            count = getEventLen(lastCommand,lastCommand,offset - 1,leftEvents);
         } else{
             System.out.println(command + " not found!");
         }
-        return 0;
-    }*/
+        return count;
+    }
 }

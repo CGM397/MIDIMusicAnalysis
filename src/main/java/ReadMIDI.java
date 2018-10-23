@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class ReadMIDI {
 
-    private String path = "D:\\1.mid";
+    private String path = "D:\\3.mid";
 
     public void readUseAPI(){
         try{
@@ -62,54 +62,28 @@ public class ReadMIDI {
             currentTime = 0;        //假定是多轨同步
             while(count < oneTrack.size()){
                 ArrayList<String> leftEvents = new ArrayList<String>();
-                for(int m = count; m < oneTrack.size(); m++){
+                for(int m = count; m < oneTrack.size(); m++)
                     leftEvents.add(oneTrack.get(m));
-                }
-                ArrayList<Integer> res = midiService.getDeltaTime(leftEvents);
-                int deltaTimeLen = res.get(0);
-                int deltaTime = res.get(1);
+
+                ArrayList<Integer> deltaTimeInfo = midiService.getDeltaTime(leftEvents);
+                int deltaTimeLen = deltaTimeInfo.get(0);
+                int deltaTime = deltaTimeInfo.get(1);
+                String command = leftEvents.get(deltaTimeLen);                    //get the command of this event
+
+                //get the delta-time
                 currentTime += deltaTime;
                 System.out.print("当前tick：" + currentTime + " ");
-                count += deltaTimeLen;
-                String command = leftEvents.get(deltaTimeLen);                    //get the command of this event
-                count++;
-                char leftNybble = command.charAt(0);
-                int channelNum = Integer.valueOf(command.charAt(1)+"",16) + 1;  //通道
-                System.out.print("使用通道：" + channelNum + " ");               //在meta事件个系统事件时没有通道
-                if(leftNybble == '8'){
-                    System.out.println("音符关闭："+midiService.getMusicalNote(leftEvents.get(deltaTimeLen+1))+"；力度："+leftEvents.get(deltaTimeLen+2));
-                    count += 2;
-                } else if(leftNybble == '9'){
-                    System.out.println("音符打开："+midiService.getMusicalNote(leftEvents.get(deltaTimeLen+1))+"；力度："+leftEvents.get(deltaTimeLen+2));
-                    count += 2;
-                } else if(leftNybble == 'a'){
-                    System.out.println("触后音符："+midiService.getMusicalNote(leftEvents.get(deltaTimeLen+1))+"；力度："+leftEvents.get(deltaTimeLen+2));
-                    count += 2;
-                } else if(leftNybble == 'b'){
-                    System.out.println("调换控制，控制号："+leftEvents.get(deltaTimeLen+1)+"；新值："+leftEvents.get(deltaTimeLen+2));
-                    count += 2;
-                } else if(leftNybble == 'c'){
-                    System.out.println("改变程序，新的程序号："+leftEvents.get(deltaTimeLen+1));
-                    count += 1;
-                } else if(leftNybble == 'd'){
-                    System.out.println("在通道后接触，管道号："+leftEvents.get(deltaTimeLen+1));
-                    count += 1;
-                } else if(leftNybble == 'e'){
-                    System.out.println("滑音，音高低位："+leftEvents.get(deltaTimeLen+1)+"；音高高位："+leftEvents.get(deltaTimeLen+2));
-                    count += 2;
-                } else if(command.equals("ff")){
-                    System.out.println("Meta事件的类型："+leftEvents.get(deltaTimeLen+1));
-                    int metaDataLen = Integer.valueOf(leftEvents.get(deltaTimeLen+2),16);
-                    count += 2;
-                    count += metaDataLen;
-                } else if(command.equals("f0")){
-                    System.out.println("系统码事件");
-                } else if(Integer.valueOf(command,16) >= 0 && Integer.valueOf(command,16) <= 127 && !lastCommand.equals("")){
 
-                } else{
-                    System.out.println(command + " not found!");
+                //get the channel
+                int channelNum = Integer.valueOf(command.charAt(1)+"",16) + 1;  //通道
+                if(!command.equals("ff"))
+                    System.out.print("使用通道：" + channelNum + " ");            //在meta事件个系统事件时没有通道
+
+                count = count + deltaTimeLen + midiService.getEventLen(command, lastCommand, deltaTimeLen, leftEvents);
+                if(Integer.valueOf(command,16) >= 128){
+                    count++;
+                    lastCommand = command;
                 }
-                lastCommand = command;
             }
         }
     }
