@@ -21,7 +21,6 @@ public class ReadMIDI {
             //tracks中包含所有轨道，一个track包含该轨道的所有事件，一个事件可以用getMessage方法来获取信息,
             //一个MidiMessage可以用getMessage方法来得到二进制文件
             Track[] tracks = sequence.getTracks();
-            System.out.println(tracks.length);
             Track track = tracks[0];
             track.ticks();
             MidiEvent event = track.get(0);
@@ -29,12 +28,11 @@ public class ReadMIDI {
             //System.out.println(event.getTick());    //得到一个事件的时间差delta time
             MidiMessage midiMessage = event.getMessage();
             System.out.println(midiMessage.getStatus());    //得到一个事件的状态码，即delta time之后的一个字节
-            byte[] store = midiMessage.getMessage();
-            for(int i = 0; i < store.length; i++){
-                System.out.print(store[i]+" ");
+            //byte[] store = midiMessage.getMessage();
+            //for(int i = 0; i < store.length; i++){
+                //System.out.print(store[i]+" ");
                 //System.out.print(Integer.valueOf(store[i]+"",2)+" ");
-            }
-            System.out.println();
+            //}
         }catch (InvalidMidiDataException e1){
             e1.printStackTrace();
         }catch (IOException e2){
@@ -76,8 +74,10 @@ public class ReadMIDI {
 
                 //get the channel
                 int channelNum = Integer.valueOf(command.charAt(1)+"",16) + 1;  //通道
-                if(!command.equals("ff"))
-                    System.out.print("使用通道：" + channelNum + " ");            //在meta事件个系统事件时没有通道
+                if(!command.equals("ff") && !command.equals("f0") && Integer.valueOf(command,16) >= 128)
+                    System.out.print("使用通道：" + channelNum + " ");            //meta事件和系统事件没有通道
+                else if(Integer.valueOf(command,16) < 128)
+                    System.out.print("使用通道：" + (Integer.valueOf(lastCommand.charAt(1)+"",16) + 1) + " ");
 
                 count = count + deltaTimeLen + midiService.getEventLen(command, lastCommand, deltaTimeLen, leftEvents);
                 if(Integer.valueOf(command,16) >= 128){
