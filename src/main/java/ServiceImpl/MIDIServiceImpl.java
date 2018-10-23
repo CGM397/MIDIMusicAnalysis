@@ -115,10 +115,10 @@ public class MIDIServiceImpl implements MIDIService {
             if(vv == 0)
                 System.out.println("音符关闭："+getMusicalNote(leftEvents.get(offset+1))+"；力度："+leftEvents.get(offset+2));
             else
-                System.out.println("音符打开："+getMusicalNote(leftEvents.get(offset+1))+"；力度："+leftEvents.get(offset+2));
+                System.out.println("音符打开："+getMusicalNote(leftEvents.get(offset+1))+"；力度："+getPressStrength(leftEvents.get(offset+2)));
             count = 2;
         } else if(leftNybble == 'a'){
-            System.out.println("触后音符："+getMusicalNote(leftEvents.get(offset+1))+"；力度："+leftEvents.get(offset+2));
+            System.out.println("触后音符："+getMusicalNote(leftEvents.get(offset+1))+"；力度："+getPressStrength(leftEvents.get(offset+2)));
             count = 2;
         } else if(leftNybble == 'b'){
             System.out.println("调换控制，控制号："+leftEvents.get(offset+1)+"；新值："+leftEvents.get(offset+2));
@@ -145,5 +145,29 @@ public class MIDIServiceImpl implements MIDIService {
             System.out.println(command + " not found!");
         }
         return count;
+    }
+
+    private String getPressStrength(String strength) {
+        int num = Integer.valueOf(strength,16);
+        String res = "";
+        if(num == 0)
+            res = "无(松开音符)";
+        else if(num >= 1 && num <= 15)
+            res = "极弱";
+        else if(num >= 16 && num <= 31)
+            res = "很弱";
+        else if(num >= 32 && num <= 47)
+            res = "弱";
+        else if(num >= 48 && num <= 63)
+            res = "中等偏弱";
+        else if(num >= 64 && num <= 79)
+            res = "中等偏强";
+        else if(num >= 80 && num <= 96)
+            res = "强";
+        else if(num >= 97 && num <= 111)
+            res = "很强";
+        else if(num >= 112 && num <= 127)
+            res = "极强";
+        return res;
     }
 }

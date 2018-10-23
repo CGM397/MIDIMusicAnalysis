@@ -4,12 +4,32 @@ import java.util.ArrayList;
 
 public interface MIDIService {
 
+    /**
+     * obtain the total sequence of the target midi file
+     * @param path the path of the target midi file
+     * @return the total sequence of the target midi file
+     */
     public ArrayList<String> getSequence(String path);
 
+    /**
+     * obtain all tracks in the given sequence
+     * @param store the given sequence
+     * @return all tracks in the given sequence
+     */
     public ArrayList<ArrayList<String>> getTracks(ArrayList<String> store);
 
+    /**
+     * obtain the delta time  of the first event in the given events
+     * @param event an event list
+     * @return the delta time  of the first event in the given events
+     */
     public ArrayList<Integer> getDeltaTime(ArrayList<String> event);
 
+    /**
+     * transform the given code into corresponding music note
+     * @param note the given music note code
+     * @return music note
+     */
     public String getMusicalNote(String  note);
 
     /**
@@ -21,4 +41,5 @@ public interface MIDIService {
      * @return the midi command data length of current MIDI event
      */
     public int getEventLen(String command, String lasCommand, int offset, ArrayList<String> leftEvents);
+
 }
