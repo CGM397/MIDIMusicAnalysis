@@ -1,6 +1,6 @@
-package ServiceImpl;
+package serviceImpl;
 
-import Service.MIDIService;
+import service.MIDIService;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -104,70 +104,84 @@ public class MIDIServiceImpl implements MIDIService {
         return res;
     }
 
-    public int getEventLen(String command, String lastCommand, int offset, ArrayList<String> leftEvents) {
+    public ArrayList<String> getEventLen(String command, String lastCommand, int offset, ArrayList<String> leftEvents) {
         char leftNybble = command.charAt(0);
-        int count = 0;
+        ArrayList<String> res = new ArrayList<String>();
         if(leftNybble == '8'){
-            System.out.println("音符关闭："+getMusicalNote(leftEvents.get(offset+1))+"；力度："+leftEvents.get(offset+2));
-            count = 2;
+            res.add("2");
+            String str = "音符关闭: "+getMusicalNote(leftEvents.get(offset+1))+"; 力度: "+leftEvents.get(offset+2);
+            res.add(str);
+            System.out.println(str);
         } else if(leftNybble == '9'){
+            res.add("2");
+            String str;
             int vv = Integer.valueOf(leftEvents.get(offset+2),16);
             if(vv == 0)
-                System.out.println("音符关闭："+getMusicalNote(leftEvents.get(offset+1))+"；力度："+leftEvents.get(offset+2));
+                str = "音符关闭: " + getMusicalNote(leftEvents.get(offset + 1)) + "; 力度: " + leftEvents.get(offset + 2);
             else
-                System.out.println("音符打开："+getMusicalNote(leftEvents.get(offset+1))+"；力度："+getPressStrength(leftEvents.get(offset+2)));
-            count = 2;
+                str = "音符打开: "+getMusicalNote(leftEvents.get(offset+1))+"; 力度: "+getPressStrength(leftEvents.get(offset+2));
+            System.out.println(str);
+            res.add(str);
         } else if(leftNybble == 'a'){
-            System.out.println("触后音符："+getMusicalNote(leftEvents.get(offset+1))+"；力度："+getPressStrength(leftEvents.get(offset+2)));
-            count = 2;
+            res.add("2");
+            String str = "触后音符: "+getMusicalNote(leftEvents.get(offset+1))+"; 力度: "+getPressStrength(leftEvents.get(offset+2));
+            System.out.println(str);
+            res.add(str);
         } else if(leftNybble == 'b'){
-            System.out.println("调换控制，控制号："+leftEvents.get(offset+1)+"；新值："+leftEvents.get(offset+2));
-            count = 2;
+            res.add("2");
+            String str = "调换控制, 控制号: "+leftEvents.get(offset+1)+"; 新值: "+leftEvents.get(offset+2);
+            System.out.println(str);
         } else if(leftNybble == 'c'){
-            System.out.println("改变程序，新的程序号："+leftEvents.get(offset+1));
-            count = 1;
+            res.add("1");
+            System.out.println("改变程序, 新的程序号: "+leftEvents.get(offset+1));
         } else if(leftNybble == 'd'){
-            System.out.println("在通道后接触，管道号："+leftEvents.get(offset+1));
-            count = 1;
+            res.add("1");
+            System.out.println("在通道后接触, 管道号: "+leftEvents.get(offset+1));
         } else if(leftNybble == 'e'){
-            System.out.println("滑音，音高低位："+leftEvents.get(offset+1)+"；音高高位："+leftEvents.get(offset+2));
-            count = 2;
+            res.add("2");
+            String str = "滑音, 音高低位: "+leftEvents.get(offset+1)+"; 音高高位: "+leftEvents.get(offset+2);
+            System.out.println(str);
         } else if(command.equals("ff")){
-            System.out.println("Meta事件的类型："+leftEvents.get(offset+1));
+            System.out.println("Meta事件的类型: "+leftEvents.get(offset+1));
             int metaDataLen = Integer.valueOf(leftEvents.get(offset+2),16);
-            count = 2;
-            count += metaDataLen;
+            res.add((2 + metaDataLen) + "");
         } else if(command.equals("f0")){
+            int count = 1;
+            while(offset + count < leftEvents.size() && !leftEvents.get(offset+count).equals("f7"))
+                count++;
+            res.add(count + "");
             System.out.println("系统码事件");
         } else if(Integer.valueOf(command,16) >= 0 && Integer.valueOf(command,16) <= 127 && !lastCommand.equals("")){
-            count = getEventLen(lastCommand,lastCommand,offset - 1,leftEvents);
+            res = getEventLen(lastCommand,lastCommand,offset - 1,leftEvents);
         } else{
+            res.add("0");
             System.out.println(command + " not found!");
         }
-        return count;
+        return res;
     }
 
     private String getPressStrength(String strength) {
         int num = Integer.valueOf(strength,16);
-        String res = "";
+        String res = num + "(";
         if(num == 0)
             res = "无(松开音符)";
         else if(num >= 1 && num <= 15)
-            res = "极弱";
+            res += "极弱";
         else if(num >= 16 && num <= 31)
-            res = "很弱";
+            res += "很弱";
         else if(num >= 32 && num <= 47)
-            res = "弱";
+            res += "弱";
         else if(num >= 48 && num <= 63)
-            res = "中等偏弱";
+            res += "中等偏弱";
         else if(num >= 64 && num <= 79)
-            res = "中等偏强";
+            res += "中等偏强";
         else if(num >= 80 && num <= 96)
-            res = "强";
+            res += "强";
         else if(num >= 97 && num <= 111)
-            res = "很强";
+            res += "很强";
         else if(num >= 112 && num <= 127)
-            res = "极强";
+            res += "极强";
+        res += ")";
         return res;
     }
 }

@@ -1,4 +1,4 @@
-package Service;
+package service;
 
 import java.util.ArrayList;
 
@@ -35,11 +35,11 @@ public interface MIDIService {
     /**
      * return the midi command data length
      * @param command current command
-     * @param lasCommand last command
+     * @param lastCommand last command
      * @param offset the pos pointing to current command in leftEvents
      * @param leftEvents start with the delta time of current MIDI event
      * @return the midi command data length of current MIDI event
      */
-    public int getEventLen(String command, String lasCommand, int offset, ArrayList<String> leftEvents);
+    public ArrayList<String> getEventLen(String command, String lastCommand, int offset, ArrayList<String> leftEvents);
 
 }
